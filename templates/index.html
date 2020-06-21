@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h3>Please choose image which you want to input</h3>
+    <form action="/dataFromAjax" method="POST" enctype="multipart/form-data" id='photo_form'>
+        <input type="file" name="file" id="imgFile" onchange="previewFile()"> 
+        <br>
+        <img src=""  height="200" alt="Image preview...">
+        <br>
+        <input type="button" value="submit" onclick="ajaxForm()">
+    </form>
+    <h3 id='res'></h3>
+    {% for message in get_flashed_messages()%}
+        {{ message }}
+    {% endfor %}
+
+</body>
+
+<script type="text/javascript" src="static\js\jquery-3.5.1.min.js"></script>
+<script>
+    
+    function ajaxForm(){
+        // var img = $('input[name="file"]').val();
+        var formFile = new FormData($('#photo_form')[0])
+    //    console.log(img);
+        $.ajax({
+            url: "./dataFromAjax",
+            type: "post", 
+            data: formFile,
+            processData: false,
+            contentType: false,
+            success: function(data){
+                // alert('success');
+                document.getElementById('res').innerText = data.result
+            },
+            error:function(e){
+                alert('error');
+            }
+        }); 
+    }
+    
+     function previewFile(){
+         var preview = document.querySelector('img')
+         var fileDom = document.querySelector('input[type=file]')
+
+         var file = fileDom.files[0]
+
+         if(file.size > 1024*1024*4){
+             alert('The size of image should not exceed 4M!');
+             return false;
+         }
+
+         var imgUrl = window.URL.createObjectURL(file)
+         preview.setAttribute("src", imgUrl)
+
+         preview.onload = function(){
+             URL.revokeObjectURL(imgUrl)
+         }
+     }
+</script>
+</html>
